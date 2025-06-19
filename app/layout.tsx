@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${comicNeue.variable} antialiased`}
+        className={`${comicNeue.variable} antialiased flex flex-col w-screen h-screen`}
       >
       <AuthProvider>
           <Header/>
