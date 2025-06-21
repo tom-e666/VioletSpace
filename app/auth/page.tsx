@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import {
     browserLocalPersistence,
     createUserWithEmailAndPassword,
@@ -15,7 +15,7 @@ import {app} from "@/app/library/firebase";
 import {useAuthContext} from "@/app/component/AuthContext";
 import Link from "next/link";
 
-export default function AuthPage() {
+function AuthPageContent() {
     const searchParams = useSearchParams();
     const action = searchParams.get('action');
     const [email, setEmail] = useState('');
@@ -24,6 +24,7 @@ export default function AuthPage() {
     const auth = getAuth(app);
     const router = useRouter();
     const {authenticated,name,onSuccessLoginOrRegister,onSuccessLogout} = useAuthContext();
+    
     const onLogin = async () => {
         if(!email.includes('@'))
         {
@@ -41,6 +42,7 @@ export default function AuthPage() {
             return;
         }
     }
+    
     const onSignup = async () => {
         if(!email.includes('@'))
         {
@@ -66,6 +68,7 @@ export default function AuthPage() {
             return;
         }
     }
+    
     const isValidatedPassword =async (password:string) => {
         const status= await validatePassword(auth,password);
         if(!status.isValid)
@@ -74,8 +77,6 @@ export default function AuthPage() {
         }
         return true;
     }
-
-
 
     if (action === "login") {
         return (
@@ -111,7 +112,6 @@ export default function AuthPage() {
                         </button>
                     </Link>
                 </div>
-
             </div>
         );
     }
@@ -146,5 +146,13 @@ export default function AuthPage() {
 
     return (
         <div className=" w-full h-full flex justify-center content-center text-2xl text-amber-300 font-bold">Are you missing something?</div>
+    );
+}
+
+export default function AuthPage() {
+    return (
+        <Suspense fallback={<div className="w-screen h-screen flex justify-center items-center">Loading...</div>}>
+            <AuthPageContent />
+        </Suspense>
     );
 }
