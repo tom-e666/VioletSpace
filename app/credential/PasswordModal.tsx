@@ -5,10 +5,10 @@ import {app} from "@/app/library/firebase";
 import {useState} from "react";
 interface NameModalProps {
     isOpenModal: boolean;
-    setIsOpenModal: (value: boolean) => void;
+    setIsOpenModalAction: (value: boolean) => void;
 }
 
-export default function PasswordModal({ isOpenModal, setIsOpenModal }: NameModalProps) {
+export default function PasswordModal({ isOpenModal, setIsOpenModalAction }: NameModalProps) {
     if (!isOpenModal) return <></>;
     const auth= getAuth(app);
     const [newPassword, setNewPassword] = useState('');
@@ -75,7 +75,7 @@ export default function PasswordModal({ isOpenModal, setIsOpenModal }: NameModal
                 </button>
                 <button
                     className="text-white bg-black border-1 border-white border-dashed rounded-xl p-2 px-4 w-fit hover:bg-white hover:text-black"
-                    onClick={() => { setIsOpenModal(false); }}
+                    onClick={() => { setIsOpenModalAction(false); }}
                 >
                     close
                 </button>

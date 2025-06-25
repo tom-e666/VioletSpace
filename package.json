@@ -9,10 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.7",
     "firebase": "^11.9.1",
     "next": "^15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-to-print": "^3.1.0",
     "toast": "^0.5.4"
   },
   "devDependencies": {

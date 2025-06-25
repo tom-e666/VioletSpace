@@ -8,6 +8,9 @@ export default function CredentialPage() {
     const {authenticated,name} = useAuthContext();
     const [isOpenModal,setIsOpenModal] = useState(false);
     const [modalContent,setModalContent] = useState<JSX.Element>();
+    const setIsOpenModalAction =(value:boolean) => {
+        setIsOpenModal(value);
+    }
     if(!authenticated) return (
         <div className="w-screen h-screen flex flex-col gap-2 items-center justify-center content-center bg-black">
             <div className="text-3xl">This page isn't for you!</div>
@@ -23,10 +26,10 @@ export default function CredentialPage() {
             </div>
             <button
                 className="px-4 py-2 rounded-xl bg-gray-200 text-black hover:bg-black hover:text-white"
-                onClick={()=>{setIsOpenModal(true);setModalContent(<NameModal isOpenModal={isOpenModal} setIsOpenModal={setIsOpenModal} />);}}
+                onClick={()=>{setIsOpenModal(true);setModalContent(<NameModal isOpenModal={isOpenModal} setIsOpenModalAction={setIsOpenModalAction} />);}}
             >Update your name</button>
             <button className="px-4 py-2 rounded-xl bg-gray-200 text-black hover:bg-black hover:text-white"
-            onClick={()=>{setIsOpenModal(true);setModalContent(<PasswordModal isOpenModal={isOpenModal} setIsOpenModal={setIsOpenModal} />);}}
+            onClick={()=>{setIsOpenModal(true);setModalContent(<PasswordModal isOpenModal={isOpenModal} setIsOpenModalAction={setIsOpenModalAction} />);}}
             >Update your password</button>
 
             {isOpenModal &&

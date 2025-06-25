@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 :root {
   --background: #000000;
   --foreground: #171717;
@@ -9,6 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-comic-neue);
   --font-mono: var(--font-comic-neue);
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 @media (prefers-color-scheme: dark) {

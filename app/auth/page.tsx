@@ -23,7 +23,7 @@ function AuthPageContent() {
     const [error, setError] = useState('');
     const auth = getAuth(app);
     const router = useRouter();
-    const {authenticated,name,onSuccessLoginOrRegister,onSuccessLogout} = useAuthContext();
+    const {onSuccessLoginOrRegister} = useAuthContext();
     
     const onLogin = async () => {
         if(!email.includes('@'))
