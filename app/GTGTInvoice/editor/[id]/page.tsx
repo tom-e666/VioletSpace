@@ -83,7 +83,7 @@ export default function Page() {
             index: 1,
             itemName: "Gạo dẻo",
             itemUnit: "Bao",
-            itemPrice: 375.000,
+            itemPrice: 375000,
             itemQuantity: 4,
             itemTotalPrice: 1500000
         }],
@@ -155,7 +155,7 @@ export default function Page() {
     }
     return (
 
-        <div className=" h-full w-full bg-black flex flex-col">
+        <div className=" h-full w-full bg-black flex flex-col font-sans">
             <div className="flex flex-row align-middle h-8 gap-4 divided border-gray-700 border-b-1">
                 <div className="text-white hover:bg-white hover:text-black px-2 rounded-xl flex items-center">Save</div>
                 <div className="text-white hover:bg-white hover:text-black px-2 rounded-xl flex items-center">Save</div>

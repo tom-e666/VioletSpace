@@ -1,13 +1,14 @@
 
 import type { Metadata } from "next";
-import { Comic_Neue } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import {AuthProvider} from "@/app/component/AuthContext";
 import Header from "@/app/component/Header";
-const comicNeue = Comic_Neue({
-  variable: "--font-comic-neue",
-  subsets: ["latin"],
-  weight: ["300", "400", "700"],
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin", "vietnamese"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${comicNeue.variable} antialiased flex flex-col w-screen h-screen`}
+        className={`${inter.variable} antialiased flex flex-col w-screen h-screen`}
       >
       <AuthProvider>
           <Header/>
