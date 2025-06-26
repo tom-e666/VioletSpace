@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import {AuthProvider} from "@/app/component/AuthContext";
+import { AuthProvider } from "@/app/component/AuthContext";
 import Header from "@/app/component/Header";
 
 const inter = Inter({
@@ -26,10 +26,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased flex flex-col w-screen h-screen`}
       >
-      <AuthProvider>
-          <Header/>
-        {children}
-      </AuthProvider>
+        <AuthProvider>
+          <Header />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

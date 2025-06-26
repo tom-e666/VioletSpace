@@ -1,8 +1,8 @@
 "use client"
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useState } from "react";
 import { useReactToPrint } from 'react-to-print';
-
+import { getCharacterizedMoney } from "@/app/library/moneyConvert";
 interface invoiceProps {
     invoiceTitle: string;
     invoiceDate: string;
@@ -40,6 +40,46 @@ export default function Page() {
     const [backgroundColor, setBackgroundColor] = useState("bg-black");
     const [textColor, setTextColor] = useState("text-white");
     const [fontSize, setFontSize] = useState("text-base");
+
+    // Unified calculation functions
+    const calculateItemTotal = (price: number, quantity: number): number => {
+        return price * quantity;
+    };
+
+    const calculateTotalItemPrice = (itemList: invoiceItemProps[]): number => {
+        return itemList.reduce((total, item) => total + item.itemTotalPrice, 0);
+    };
+
+    const calculateTaxAmount = (totalItemPrice: number, taxRate: number): number => {
+        return totalItemPrice * taxRate;
+    };
+
+    const calculateTotalAfterTax = (totalItemPrice: number, taxAmount: number): number => {
+        return totalItemPrice + taxAmount;
+    };
+
+    const recalculateInvoice = (updatedInvoice: invoiceProps): invoiceProps => {
+        // Recalculate item totals
+        const updatedItemList = updatedInvoice.itemList.map(item => ({
+            ...item,
+            itemTotalPrice: calculateItemTotal(item.itemPrice, item.itemQuantity)
+        }));
+
+        // Recalculate totals
+        const totalItemPrice = calculateTotalItemPrice(updatedItemList);
+        const GTGTTaxAmount = calculateTaxAmount(totalItemPrice, updatedInvoice.GTGTTaxRate);
+        const totalPriceAfterTax = calculateTotalAfterTax(totalItemPrice, GTGTTaxAmount);
+        const totalPriceByText = getCharacterizedMoney(totalPriceAfterTax);
+
+        return {
+            ...updatedInvoice,
+            itemList: updatedItemList,
+            totalItemPrice,
+            GTGTTaxAmount,
+            totalPriceAfterTax,
+            totalPriceByText
+        };
+    };
     const obtainCurrentDate = () => {
         const now = new Date();
         return ` Ngày ${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}`;
@@ -53,50 +93,56 @@ export default function Page() {
             itemQuantity: 0,
             itemTotalPrice: 0
         };
-        setInvoice({ ...invoice, itemList: [...invoice.itemList, newItem] });
+        const updatedInvoice = { ...invoice, itemList: [...invoice.itemList, newItem] };
+        setInvoice(recalculateInvoice(updatedInvoice));
     }
     const removeLastItem = () => {
         if (invoice.itemList.length > 0) {
             const newItemList = invoice.itemList.slice(0, -1);
-            setInvoice({ ...invoice, itemList: newItemList });
+            const updatedInvoice = { ...invoice, itemList: newItemList };
+            setInvoice(recalculateInvoice(updatedInvoice));
         }
     }
-    const [invoice, setInvoice] = useState<invoiceProps>({
-        invoiceTitle: "Hóa đơn GTGT",
-        invoiceDate: obtainCurrentDate(),
-        taxDepartmentId: "00AEAC8090AF6943A89DD5F1F345EFA07F",
-        invoiceId: "1C24TPT",
-        number: "00000134",
-        retailerName: "DOANH NGHIỆP TƯ NHÂN PHƯỚC THÀNH 2",
-        retailerTaxIdNumber: "1200363796",
-        retailerAddress: "Ấp An Thiện, Xã An Cư, Huyện Cái Bè, Tỉnh Tiền Giang",
-        retailerBankNumber: "...",
-        reailerBankName: "...",
-        consumerName: "...",
-        consumerDepartmentName: "HỘ KINH DOANH BIỂN NGỌC",
-        consumerTaxIdNumber: "8597592335-001",
-        consumerAddress: "Tổ dân phố Mỹ Lương - Phường Ninh Thủy - Thị xã Ninh Hòa - Khánh Hòa.",
-        consumerBankNumber: "...",
-        paymentMethod: "Thanh toán tiền mặt",
-        consumerBankName: "...",
-        itemList: [{
-            index: 1,
-            itemName: "Gạo dẻo",
-            itemUnit: "Bao",
-            itemPrice: 375000,
-            itemQuantity: 4,
-            itemTotalPrice: 1500000
-        }],
-        totalItemPrice: 1500000,
-        GTGTTaxRate: 0.05,
-        GTGTTaxAmount: 75000,
-        totalPriceAfterTax: 1575000,
-        totalPriceByText: "Mười một triệu một trăm bảy mươi lăm nghìn đồng"
+    const [invoice, setInvoice] = useState<invoiceProps>(() => {
+        const initialInvoice: invoiceProps = {
+            invoiceTitle: "Hóa đơn GTGT",
+            invoiceDate: obtainCurrentDate(),
+            taxDepartmentId: "00AEAC8090AF6943A89DD5F1F345EFA07F",
+            invoiceId: "1C24TPT",
+            number: "00000134",
+            retailerName: "DOANH NGHIỆP TƯ NHÂN PHƯỚC THÀNH 2",
+            retailerTaxIdNumber: "1200363796",
+            retailerAddress: "Ấp An Thiện, Xã An Cư, Huyện Cái Bè, Tỉnh Tiền Giang",
+            retailerBankNumber: "...",
+            reailerBankName: "...",
+            consumerName: "...",
+            consumerDepartmentName: "HỘ KINH DOANH BIỂN NGỌC",
+            consumerTaxIdNumber: "8597592335-001",
+            consumerAddress: "Tổ dân phố Mỹ Lương - Phường Ninh Thủy - Thị xã Ninh Hòa - Khánh Hòa.",
+            consumerBankNumber: "...",
+            paymentMethod: "Thanh toán tiền mặt",
+            consumerBankName: "...",
+            itemList: [{
+                index: 1,
+                itemName: "Gạo dẻo",
+                itemUnit: "Bao",
+                itemPrice: 375000,
+                itemQuantity: 4,
+                itemTotalPrice: 0 // Will be calculated
+            }],
+            totalItemPrice: 0, // Will be calculated
+            GTGTTaxRate: 0.05,
+            GTGTTaxAmount: 0, // Will be calculated
+            totalPriceAfterTax: 0, // Will be calculated
+            totalPriceByText: "" // Will be calculated
+        };
+        return recalculateInvoice(initialInvoice);
     });
     const getBeautifyEmptyCell = () => {
 
         return invoice.itemList.length < 5 ? 5 - invoice.itemList.length : 0;
     }
+
     const printRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = useReactToPrint({
@@ -268,8 +314,8 @@ export default function Page() {
                                     <th className="border border-gray-700 p-1 text-center text-sm">STT</th>
                                     <th className="border border-gray-700 p-1 text-center text-sm">Tên hàng hóa, dịch vụ</th>
                                     <th className="border border-gray-700 p-1 text-center text-sm">Đơn vị tính</th>
-                                    <th className="border border-gray-700 p-1 text-center text-sm">Đơn giá</th>
                                     <th className="border border-gray-700 p-1 text-center text-sm">Số lượng</th>
+                                    <th className="border border-gray-700 p-1 text-center text-sm">Đơn giá</th>
                                     <th className="border border-gray-700 p-1 text-center text-sm">Thành tiền</th>
                                 </tr>
                             </thead>
@@ -278,8 +324,8 @@ export default function Page() {
                                     <td className="border border-gray-700 p-1 text-center text-xs">1</td>
                                     <td className="border border-gray-700 p-1 text-center text-xs">2</td>
                                     <td className="border border-gray-700 p-1 text-center text-xs">3</td>
-                                    <td className="border border-gray-700 p-1 text-center text-xs">4</td>
                                     <td className="border border-gray-700 p-1 text-center text-xs">5</td>
+                                    <td className="border border-gray-700 p-1 text-center text-xs">4</td>
                                     <td className="border border-gray-700 p-1 text-center text-xs">6=4x5</td>
                                 </tr>
                                 {invoice.itemList.map((item, index) => {
@@ -301,19 +347,21 @@ export default function Page() {
                                                 }} />
                                             </td>
                                             <td className="border border-gray-700 p-1 text-center">
-                                                <input className="w-full bg-transparent border-0 outline-none text-center text-sm" type="number" value={item.itemPrice} onChange={(e) => {
+                                                <input className="w-full bg-transparent border-0 outline-none text-center text-sm" type="number" value={item.itemQuantity || ''} onChange={(e) => {
                                                     const newItemList = [...invoice.itemList];
-                                                    newItemList[index].itemPrice = parseFloat(e.target.value);
-                                                    newItemList[index].itemTotalPrice = newItemList[index].itemPrice * newItemList[index].itemQuantity;
-                                                    setInvoice({ ...invoice, itemList: newItemList });
+                                                    const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                                    newItemList[index].itemQuantity = isNaN(value) ? 0 : value;
+                                                    const updatedInvoice = { ...invoice, itemList: newItemList };
+                                                    setInvoice(recalculateInvoice(updatedInvoice));
                                                 }} />
                                             </td>
                                             <td className="border border-gray-700 p-1 text-center">
-                                                <input className="w-full bg-transparent border-0 outline-none text-center text-sm" type="number" value={item.itemQuantity} onChange={(e) => {
+                                                <input className="w-full bg-transparent border-0 outline-none text-center text-sm" type="number" value={item.itemPrice || ''} onChange={(e) => {
                                                     const newItemList = [...invoice.itemList];
-                                                    newItemList[index].itemQuantity = parseFloat(e.target.value);
-                                                    newItemList[index].itemTotalPrice = newItemList[index].itemPrice * newItemList[index].itemQuantity;
-                                                    setInvoice({ ...invoice, itemList: newItemList });
+                                                    const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                                    newItemList[index].itemPrice = isNaN(value) ? 0 : value;
+                                                    const updatedInvoice = { ...invoice, itemList: newItemList };
+                                                    setInvoice(recalculateInvoice(updatedInvoice));
                                                 }} />
                                             </td>
                                             <td className="border border-gray-700 p-1 text-center">
@@ -345,9 +393,11 @@ export default function Page() {
                                     <td colSpan={6} className="font-bold border border-gray-700 p-1">
                                         <div className="flex flex-row">
                                             <div className="w-64">Thuế suất GTGT:</div>
-                                            <input className="w-8 bg-transparent border-0 outline-none text-right " type="number" min={0} max={1000} value={invoice.GTGTTaxRate * 100} onChange={(e) => {
-                                                const newTaxRate = parseFloat(e.target.value) / 100;
-                                                setInvoice({ ...invoice, GTGTTaxRate: newTaxRate, GTGTTaxAmount: invoice.totalItemPrice * newTaxRate, totalPriceAfterTax: invoice.totalItemPrice + (invoice.totalItemPrice * newTaxRate) });
+                                            <input className="w-8 bg-transparent border-0 outline-none text-right " type="number" min={0} max={1000} value={invoice.GTGTTaxRate * 100 || ''} onChange={(e) => {
+                                                const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                                const newTaxRate = isNaN(value) ? 0 : value / 100;
+                                                const updatedInvoice = { ...invoice, GTGTTaxRate: newTaxRate };
+                                                setInvoice(recalculateInvoice(updatedInvoice));
                                             }} />%
                                             <div className="w-64 pl-16">Tiền thuế GTGT:</div>
                                             <div>{invoice.GTGTTaxAmount.toLocaleString('de-DE')}</div>
