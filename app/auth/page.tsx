@@ -11,8 +11,8 @@ import {
     signInWithEmailAndPassword,
     validatePassword
 } from "@firebase/auth";
-import {app} from "@/app/library/firebase";
-import {useAuthContext} from "@/app/component/AuthContext";
+import { app } from "@/app/library/firebase";
+import { useAuthContext } from "@/app/component/AuthContext";
 import Link from "next/link";
 
 function AuthPageContent() {
@@ -23,56 +23,50 @@ function AuthPageContent() {
     const [error, setError] = useState('');
     const auth = getAuth(app);
     const router = useRouter();
-    const {onSuccessLoginOrRegister} = useAuthContext();
-    
+    const { onSuccessLoginOrRegister } = useAuthContext();
+
     const onLogin = async () => {
-        if(!email.includes('@'))
-        {
+        if (!email.includes('@')) {
             throw new Error('Invalid email format');
         }
         try {
-            const response = await signInWithEmailAndPassword(auth,email,password);
+            const response = await signInWithEmailAndPassword(auth, email, password);
 
-            onSuccessLoginOrRegister(response.user.displayName??'N/A');
+            onSuccessLoginOrRegister(response.user.displayName ?? 'N/A', response.user.uid ?? 'N/A');
             await setPersistence(auth, browserLocalPersistence)
-            setTimeout(()=>{router.push('/workspace');},1);
-        }catch(e:any)
-        {
+            setTimeout(() => { router.push('/workspace'); }, 1);
+        } catch (e: any) {
             setError(e.message);
             return;
         }
     }
-    
+
     const onSignup = async () => {
-        if(!email.includes('@'))
-        {
+        if (!email.includes('@')) {
             throw new Error('Invalid email format');
         }
         try {
             await isValidatedPassword(password);
-        }catch(e:any)
-        {
+        } catch (e: any) {
             setError(e.message);
             return;
         }
 
         try {
-            const response = await createUserWithEmailAndPassword(auth,email,password);
-            onSuccessLoginOrRegister(response.user.displayName??'N/A');
-            setTimeout(()=>{
+            const response = await createUserWithEmailAndPassword(auth, email, password);
+            onSuccessLoginOrRegister(response.user.displayName ?? 'N/A', response.user.uid ?? 'N/A');
+            setTimeout(() => {
                 router.push('/workspace');
-            },1);
-        }catch(e:any)
-        {
+            }, 1);
+        } catch (e: any) {
             setError(e.message);
             return;
         }
     }
-    
-    const isValidatedPassword =async (password:string) => {
-        const status= await validatePassword(auth,password);
-        if(!status.isValid)
-        {
+
+    const isValidatedPassword = async (password: string) => {
+        const status = await validatePassword(auth, password);
+        if (!status.isValid) {
             throw new Error('Invalid password. Password must be at least 6 characters, contain at least one uppercase letter, one lowercase letter, and one number.');
         }
         return true;
