@@ -1,6 +1,8 @@
 "use client"
 import React, { useRef, useEffect } from "react";
 import { useState } from "react";
+import { useParams } from "next/navigation";
+import mockProfiles, { InvoiceProfile } from "./mockData";
 import { useReactToPrint } from 'react-to-print';
 import { getCharacterizedMoney } from "@/app/library/moneyConvert";
 interface invoiceProps {
@@ -37,6 +39,8 @@ interface invoiceItemProps {
     itemTotalPrice: number;
 }
 export default function Page() {
+    const params = useParams();
+    const { id } = params as { id?: string };
     const [backgroundColor, setBackgroundColor] = useState("bg-black");
     const [textColor, setTextColor] = useState("text-white");
     const [fontSize, setFontSize] = useState("text-base");
@@ -104,39 +108,16 @@ export default function Page() {
         }
     }
     const [invoice, setInvoice] = useState<invoiceProps>(() => {
-        const initialInvoice: invoiceProps = {
-            invoiceTitle: "Hóa đơn GTGT",
-            invoiceDate: obtainCurrentDate(),
-            taxDepartmentId: "00AEAC8090AF6943A89DD5F1F345EFA07F",
-            invoiceId: "1C24TPT",
-            number: "00000134",
-            retailerName: "DOANH NGHIỆP TƯ NHÂN PHƯỚC THÀNH 2",
-            retailerTaxIdNumber: "1200363796",
-            retailerAddress: "Ấp An Thiện, Xã An Cư, Huyện Cái Bè, Tỉnh Tiền Giang",
-            retailerBankNumber: "...",
-            reailerBankName: "...",
-            consumerName: "...",
-            consumerDepartmentName: "HỘ KINH DOANH BIỂN NGỌC",
-            consumerTaxIdNumber: "8597592335-001",
-            consumerAddress: "Tổ dân phố Mỹ Lương - Phường Ninh Thủy - Thị xã Ninh Hòa - Khánh Hòa.",
-            consumerBankNumber: "...",
-            paymentMethod: "Thanh toán tiền mặt",
-            consumerBankName: "...",
-            itemList: [{
-                index: 1,
-                itemName: "Gạo dẻo",
-                itemUnit: "Bao",
-                itemPrice: 375000,
-                itemQuantity: 4,
-                itemTotalPrice: 0 // Will be calculated
-            }],
-            totalItemPrice: 0, // Will be calculated
-            GTGTTaxRate: 0.05,
-            GTGTTaxAmount: 0, // Will be calculated
-            totalPriceAfterTax: 0, // Will be calculated
-            totalPriceByText: "" // Will be calculated
-        };
-        return recalculateInvoice(initialInvoice);
+        let initialInvoice: InvoiceProfile | undefined;
+        if (id) {
+            initialInvoice = mockProfiles.find(profile => profile.id === id);
+        }
+        if (!initialInvoice) {
+            // fallback to first profile or default
+            initialInvoice = mockProfiles[0];
+        }
+        // recalculate in case data is not up to date
+        return recalculateInvoice(initialInvoice as any);
     });
     const getBeautifyEmptyCell = () => {
 
@@ -227,7 +208,7 @@ export default function Page() {
                             <div className="flex flex-col items-center print-tax-code">
                                 <div className="font-bold text-sm mb-1">Mã của cơ quan thuế:</div>
                                 <input
-                                    className="text-center w-full bg-transparent border-0 outline-none text-sm"
+                                    className="text-center w-full bg-transparent border-0 outline-none text-sm min-w-60"
                                     value={invoice.taxDepartmentId}
                                     placeholder="Mã số thuế..."
                                     onChange={(e) => setInvoice({ ...invoice, taxDepartmentId: e.target.value })} />
